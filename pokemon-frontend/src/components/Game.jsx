@@ -4,29 +4,13 @@ import Hints from "./Hints"
 export default function Game({pokemon}){
 
     const [pokemonGuess, setPokemonGuess] = useState("");
-    const pokemonName; //fetched from backend
 
-    fetch("api/today")
-    
-    const hintsArray = [] //fetched from backend
+    const hintsArray = []
 
     function guessPokemon(){
         alert(`You guessed ${pokemonGuess}`)
         //if wrong, send the prop to the Hints component to dynamically show hints about that pokemon
-        let attempts = 0;
-
-        if(pokemonGuess != pokemonName){
-            attempts++;
-            hintsArray[0] //first from the hints should be displayed
-            fetch("/api/hints", {
-                method: "POST",
-                body: JSON.stringify({ attempts: attempts })
-            })
-            .then(response => {
-                let sprite = setSprite(response.sprite)
-                let hints = setHints([response.hints])
-            })
-        }
+        let attempts;
     }
 
     return(
