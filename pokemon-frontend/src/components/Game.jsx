@@ -8,7 +8,6 @@ export default function Game({pokemon}){
     const hintsArray = [] //fetched from backend 
     
     function guessPokemon(){ 
-        alert(You guessed ${pokemonGuess}) 
         //if wrong, send the prop to the Hints component to dynamically show hints about that pokemon 
         let attempts = 0; 
         
