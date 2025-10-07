@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from "react" 
 import Hints from "./Hints" 
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Game({pokemon}){ 
     const [pokemonGuess, setPokemonGuess] = useState(""); 
     const [pokemonName, setPokemonName] = useState("");
@@ -11,7 +13,7 @@ export default function Game({pokemon}){
     const [answer, setAnswer] = useState("");
     
     useEffect(() => {
-        fetch('/api/today', {
+        fetch(`${API_URL}/api/today`, {
             headers: { 'Content-Type': 'application/json' }
         })
             .then(response => response.json())
@@ -72,7 +74,7 @@ export default function Game({pokemon}){
                         return;
                     }
 
-                    fetch("/api/guess", {
+                    fetch(`${API_URL}/api/guess`, {
                         method: "POST",
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
