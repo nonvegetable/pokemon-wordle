@@ -1,15 +1,19 @@
-import { useState } from 'react'
-import './App.css'
-import Game from './components/Game'
+import React from 'react';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import Game from './components/Game';
+import './App.css'; // Make sure to import your CSS
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <Game />
-    </>
-  )
+    <div className="app-container">
+      <Navbar />
+      <main>
+        <Game />
+      </main>
+      <Footer />
+    </div>
+  );
 }
 
-export default App
+export default App;
