@@ -3,7 +3,8 @@ import Hints from "./Hints"
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function Game({pokemon}){ 
+export default function Game({pokemon}){
+    const MAX_ATTEMPTS = 4; 
     const [pokemonGuess, setPokemonGuess] = useState(""); 
     const [pokemonName, setPokemonName] = useState("");
     const [spriteUrl, setSpriteUrl] = useState(null); 
@@ -62,11 +63,10 @@ export default function Game({pokemon}){
         return (
             <div className="game-area">
                 <h1>PokéGuess</h1>
-                <img 
-                    src={spriteUrl} 
-                    alt="A blurred pokemon" 
-                    className={`pokemon-sprite attempts-${attempts} ${isCorrect || attempts >= 4 ? 'revealed' : ''}`}
-                />
+                <div className="attempts-counter">
+                    Guesses Remaining: {MAX_ATTEMPTS - attempts}
+                </div>
+                <img src={spriteUrl} alt="A blurred pokemon" className={`pokemon-sprite attempts-${attempts} ${isCorrect || attempts >= 4 ? 'revealed' : ''}`}/>
                 <form onSubmit={(event) => {
                     event.preventDefault();
 
