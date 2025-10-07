@@ -28,17 +28,19 @@ def fetch_pokemon_data():
     global current_pokemon
     current_pokemon = {
         "name": pokemon_data["name"],
-        "type": pokemon_data["types"][0]["type"]["name"],
+        "types": [t['type']['name'] for t in pokemon_data['types']], 
         "ability": pokemon_data["abilities"][0]["ability"]["name"],
-        "generation": species_data["generation"]["name"],
         "region": region,
         "is_legendary": species_data["is_legendary"],
-        "flavor_text": species_data["flavor_text_entries"][0]["flavor_text"]
+        "is_mythical": species_data["is_mythical"],
+        "evolves_from": species_data.get("evolves_from_species"), 
+        "color": species_data["color"]["name"],
+        "flavor_text": species_data["flavor_text_entries"][0]["flavor_text"].replace('\n', ' ').replace('\f', ' ') 
     }
 
     return jsonify({
         "sprite": pokemon_data["sprites"]["front_default"],
-        "first_hint": f"This Pokémon is a {current_pokemon['type'].capitalize()} type from the {current_pokemon['region']} region!"
+        "first_hint": f"This Pokémon is a {current_pokemon['types'][0].capitalize()} type."
     })
 
 # previously tried to use the hints api to give hints instead of checking guesses
@@ -46,7 +48,7 @@ def fetch_pokemon_data():
 
 # @app.route('/api/hints', methods=['POST'])
 # def get_hints():
-#     attempts = request.json.get("attempts")
+#     attempts = request.json.get("attempts")rom the {current_pokemon['region']} region!
 #     hint_list = [
 #         f"Type: {current_pokemon['type'].capitalize()}",
 #         f"Region: {current_pokemon['region']}",
@@ -57,16 +59,47 @@ def fetch_pokemon_data():
 
 @app.route('/api/guess', methods=['POST'])
 def user_guess():
-    user_guess = request.json.get("pokemonGuess", "").lower()
+    data = request.json
+    user_guess = data.get("pokemonGuess", "").lower()
+    attempts = data.get("attempts", 0)
     actual_name = current_pokemon.get("name", "").lower()
 
     if user_guess == actual_name:
         return jsonify({"correct": True})
     else:
-        return jsonify({
+
+        hint_pool = []
+
+        if current_pokemon['is_legendary']:
+            hint_pool.append("This Pokémon is considered Legendary.")
+        elif current_pokemon['is_mythical']:
+            hint_pool.append("This Pokémon is considered Mythical.")
+
+        if current_pokemon['evolves_from']:
+            hint_pool.append("This Pokémon evolves from another species.")
+        else:
+            hint_pool.append("This Pokémon does not evolve.")
+            
+        if len(current_pokemon['types']) > 1:
+            hint_pool.append(f"It has two types; one of them is {current_pokemon['types'][0].capitalize()}.")
+
+        hint_pool.append(f"It is primarily {current_pokemon['color']} in color.")
+        hint_pool.append(f"It can be found in the {current_pokemon['region']} region.")
+        hint_pool.append(f"Its name starts with the letter: {current_pokemon['name'][0].upper()}")
+        hint_pool.append(f"One of its abilities is {current_pokemon['ability'].capitalize()}.")
+        random.shuffle(hint_pool)
+        hint_pool.append(f"Pokédex entry: {current_pokemon['flavor_text']}")
+        hint_index = min(attempts, len(hint_pool) - 1)
+
+        response_data = {
             "correct": False,
-            "new_hint": f"Starts with: {current_pokemon['name'][0].upper()}"
-        })
+            "new_hint": hint_pool[hint_index] \
+        }
+    
+        if attempts >= 3:
+            response_data["answer"] = current_pokemon['name'].capitalize()
+
+        return jsonify(response_data)
 
 if __name__ == '__main__':
     app.run(port=5000)
