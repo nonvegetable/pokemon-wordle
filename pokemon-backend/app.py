@@ -41,17 +41,19 @@ def fetch_pokemon_data():
         "first_hint": f"This Pokémon is a {current_pokemon['type'].capitalize()} type from the {current_pokemon['region']} region!"
     })
 
+# previously tried to use the hints api to give hints instead of checking guesses
+# still keeping it here jsut in cas efor the future
 
-@app.route('/api/hints', methods=['POST'])
-def get_hints():
-    attempts = request.json.get("attempts")
-    hint_list = [
-        f"Type: {current_pokemon['type'].capitalize()}",
-        f"Region: {current_pokemon['region']}",
-        f"Ability: {current_pokemon['ability'].capitalize()}",
-        f"Fun fact: {current_pokemon['flavor_text']}",
-    ]
-    return jsonify({ "hint": hint_list[min(attempts, len(hint_list)-1)] })
+# @app.route('/api/hints', methods=['POST'])
+# def get_hints():
+#     attempts = request.json.get("attempts")
+#     hint_list = [
+#         f"Type: {current_pokemon['type'].capitalize()}",
+#         f"Region: {current_pokemon['region']}",
+#         f"Ability: {current_pokemon['ability'].capitalize()}",
+#         f"Fun fact: {current_pokemon['flavor_text']}",
+#     ]
+#     return jsonify({ "hint": hint_list[min(attempts, len(hint_list)-1)] })
 
 @app.route('/api/guess', methods=['POST'])
 def user_guess():

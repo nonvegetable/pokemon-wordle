@@ -1,36 +1,60 @@
-import React, {useState} from "react" 
+import React, {useEffect, useState} from "react" 
 import Hints from "./Hints" 
 
 export default function Game({pokemon}){ 
     const [pokemonGuess, setPokemonGuess] = useState(""); 
-    const pokemonName; //fetched from backend 
-    fetch("api/today") 
-    const hintsArray = [] //fetched from backend 
+    const [pokemonName, setPokemonName] = useState("");
+    const [spriteUrl, setSpriteUrl] = useState(''); // Or null
+    const [hints, setHints] = useState([]);
+    const [attempts, setAttempts] = useState(0);
+    const [isCorrect, setIsCorrect] = useState(false);
     
-    function guessPokemon(){ 
-        //if wrong, send the prop to the Hints component to dynamically show hints about that pokemon 
-        let attempts = 0; 
+    useEffect(() => {
+        fetch('/api/today')
+            .then(response => response.json())
+            .then(data => {
+                setSpriteUrl(data.sprite);
+                setHints([data.first_hint]);
+            })
+    }, []); 
+    
+    function guessPokemon() {
+        fetch("/api/guess", {
+                method: "POST",
+                body: JSON.stringify({ pokemonGuess: pokemonGuess })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.correct) {
+                    setIsCorrect(true);
+                } else {
+                    setHints(prevHints => [...prevHints, data.new_hint]);
+                    setAttempts(prevAttempts => prevAttempts + 1);
+                }
+            })
+    }
         
-        if(pokemonGuess != pokemonName){ 
-            attempts++; hintsArray[0] //first from the hints should be displayed 
-            fetch("/api/hints", { 
-                method: "POST", 
-                body: JSON.stringify({ attempts: attempts }) }) 
-                .then(response => { let sprite = setSprite(response.sprite) 
-                    let hints = setHints([response.hints]) 
-                }) 
-            } 
-        } 
+        // if(pokemonGuess != pokemonName){ 
+        //     attempts++; hintsArray[0] 
+        //     fetch("/api/hints", { 
+        //         method: "POST", 
+        //         body: JSON.stringify({ attempts: attempts}) 
+        //     }) 
+        //     .then(
+        //         response => { let sprite = setSprite(response.sprite) 
+        //         let hints = setHints([response.hints]) 
+        //     }) 
+        // } 
         
         return( 
             <> 
                 <h1>Welcome to Guess the Pokemon</h1>
                 <div className="game-area"> 
-                    <img src="something" alt="pokemon"/> 
+                    <img src={spriteUrl} alt="A blurred pokemon"/> 
                     <input type="text" value={pokemonGuess} onChange={(e) => setPokemonGuess(e.target.value)} /> 
-                    <button className="guess-btn" onClick={guessPokemon} >Guess</button> 
-                    {/* <Hints pokemon={{pokemonName: name, no: attempts, hints: hintsArray}}/> */} 
-                </div> 
+                    <button className="guess-btn" onClick={guessPokemon}>Guess</button> 
+                    <Hints hints={hints} /> 
+                </div>
             </> 
         )
     }
