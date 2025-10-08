@@ -3,7 +3,7 @@ from flask_cors import CORS
 import requests
 import random
 from datetime import date
-from thefuzz import fuzz # <-- NEW: Import for fuzzy string matching
+from thefuzz import fuzz 
 
 regions = {
   "generation-i": "Kanto",
