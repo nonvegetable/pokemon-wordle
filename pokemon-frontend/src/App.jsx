@@ -2,7 +2,7 @@ import React from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Game from './components/Game';
-import './App.css'; // Make sure to import your CSS
+import './App.css'; 
 
 function App() {
   return (
